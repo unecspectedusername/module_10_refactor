@@ -1,3 +1,100 @@
+const data = `{
+  "surname": [
+    "Иванов",
+    "Смирнов",
+    "Кузнецов",
+    "Васильев",
+    "Петров",
+    "Михайлов",
+    "Новиков",
+    "Федоров",
+    "Кравцов",
+    "Николаев",
+    "Семёнов",
+    "Славин",
+    "Степанов",
+    "Павлов",
+    "Александров",
+    "Морозов"
+  ],
+  "male": {
+    "firstName": [
+      "Александр",
+      "Максим",
+      "Иван",
+      "Артем",
+      "Дмитрий",
+      "Никита",
+      "Михаил",
+      "Даниил",
+      "Егор",
+      "Андрей"
+    ],
+    "profession": [
+      "Манекен для краш-тестов",
+      "Решатель капчи",
+      "Пивной сомелье",
+      "Телеканал РЕН-ТВ: штатный экзорцист",
+      "Акробат - гомеопат",
+      "Гений, миллиардер, филантроп",
+      "UX/UI дизайнер Facebook (запрещено в РФ)",
+      "Разработчик браузера Амиго",
+      "Коллекционер плагинов VS Code",
+      "Проставитель точки с запятой в коде JS"
+    ],
+    "avatar": [
+      "assets/m1.jpg",
+      "assets/m2.jpg",
+      "assets/m3.jpg",
+      "assets/m4.jpg",
+      "assets/m5.jpg",
+      "assets/m6.jpg",
+      "assets/m7.jpg",
+      "assets/m8.jpg",
+      "assets/m9.jpg",
+      "assets/m10.jpg"
+    ]
+  },
+  "female": {
+    "firstName": [
+      "Ольга",
+      "Екатерина",
+      "Елизавета",
+      "Ирина",
+      "Наталья",
+      "Анна",
+      "Анастасия",
+      "Татьяна",
+      "Елена",
+      "Марина"
+    ],
+    "profession": [
+      "Штатный таролог Московской биржи",
+      "Распутывательница проводов наушников",
+      "Автоответчица в колл-центре",
+      "Критик турецких сериалов",
+      "Металлургиня",
+      "Разрабатывательница феминитивов",
+      "Потомственная ведунья",
+      "Телеграм бот",
+      "PR менеджер Алексея Панина",
+      "Тренер личностного упадка"
+    ],
+    "avatar": [
+      "assets/w1.jpg",
+      "assets/w2.jpg",
+      "assets/w3.jpg",
+      "assets/w4.jpg",
+      "assets/w5.jpg",
+      "assets/w6.jpg",
+      "assets/w7.jpg",
+      "assets/w8.jpg",
+      "assets/w9.jpg",
+      "assets/w10.jpg"
+    ]
+  }
+}`
+
 class Random {
     getRandomInt(max, min = 0) {
         return Math.floor(Math.random() * (max - min)) + min;
@@ -11,6 +108,7 @@ class Random {
         return array[randomIndex];
     }
 }
+
 class Birthday {
 
     random = new Random();
@@ -43,6 +141,16 @@ class Birthday {
             }
         } else {
             return this.random.getRandomInt(31, 1);
+        }
+    }
+}
+
+class DataParser {
+    static parse(JSONdata) {
+        try {
+            return JSON.parse(JSONdata);
+        } catch (error) {
+            throw new Error('Некорректный JSON: ' + error.message);
         }
     }
 }
@@ -93,33 +201,36 @@ class PersonalData {
         return this.random.getRandomData(this.data[this.gender].avatar)
     }
 }
-class DataParser {
-    static parse(JSONdata) {
-        try {
-            return JSON.parse(JSONdata);
-        } catch (error) {
-            throw new Error('Некорректный JSON: ' + error.message);
-        }
-    }
-}
 
 class Person {
-    constructor({ data, personalData, random, birthday}) {
+    constructor({ data, personalData, random, birthday, gender}) {
         this.data = data;
         this.personalData = personalData;
         this.random = random;
         this.birthday = birthday;
+        this._gender = gender;
+    }
+
+    log() {
+        console.log(this._gender)
     }
 }
 
-class Woman extends Person {
-
-    constructor({ gender = 'female', ...personArgs}) {
-        super(personArgs);
+class Employed extends Person {
+    constructor(parentArgs) {
+        super(parentArgs);
     }
 
     get profession() {
-        return this.random.getRandomData(this.data.female.profession)
+        return this.random.getRandomData(this.data[this._gender].profession)
+    }
+
+}
+
+class Woman extends Employed {
+
+    constructor(parentArgs) {
+        super(parentArgs);
     }
 
     get gender() {
@@ -128,18 +239,12 @@ class Woman extends Person {
 
 }
 
-class Man extends Person {
-    constructor({ gender = 'female', ...personArgs}) {
-        super(personArgs);
-    }
-
-    get profession() {
-        console.log(this.data)
-        return this.random.getRandomData(this.data.male.profession)
+class Man extends Employed {
+    constructor(parentArgs) {
+        super(parentArgs);
     }
 
     get gender() {
         return 'Мужчина';
     }
-
 }

@@ -17,8 +17,7 @@ function makeRandomPerson () {
     props.gender = props.random.getRandomBool() ? 'male' : 'female';
     props.personalData = new PersonalData(props.data, props.gender)
 
-
-    const person = gender === 'male' ? new Man(props) : new Woman(props);
+    const person = props.gender === 'male' ? new Man(props) : new Woman(props);
 
     document.querySelector('#image').style.backgroundImage = `url('${person.personalData.avatar}')`;
     document.querySelector('#name').textContent = `${person.personalData.firstName} ${person.personalData.middleName} ${person.personalData.lastName}`;
